@@ -46,28 +46,28 @@ def construct_input(prompt_dict, judge_mode, setting, instruction, responses):
     prompt = prompt_dict["start"] + "\nEvaluation Steps:\n" + prompt_dict["settings"][setting] + "\nEvaluation Method:\n" + prompt_dict["tasks"][judge_mode] + "\nNotice:\n" + prompt_dict["notice"] + "\nHere is the input:\n"
     if judge_mode == "score":
         prompt += f"""
-[The Start of User Instruction]
-{instruction}
-[The End of User Instruction]
-[The Start of Assistant’s Answer]
-{responses[0]}
-[The End of Assistant’s Answer]""" 
+            [The Start of User Instruction]
+            {instruction}
+            [The End of User Instruction]
+            [The Start of Assistant’s Answer]
+            {responses[0]}
+            [The End of Assistant’s Answer]""" 
     elif judge_mode == 'pair':
         prompt += f"""
-[The Start of User Instruction]
-{instruction}
-[The End of User Instruction]
-[The Start of Assistant A’s Answer]
-{responses[0]}
-[The End of Assistant A’s Answer]
-[The Start of Assistant B’s Answer]
-{responses[1]}
-[The End of Assistant B’s Answer]"""
+            [The Start of User Instruction]
+            {instruction}
+            [The End of User Instruction]
+            [The Start of Assistant A’s Answer]
+            {responses[0]}
+            [The End of Assistant A’s Answer]
+            [The Start of Assistant B’s Answer]
+            {responses[1]}
+            [The End of Assistant B’s Answer]"""
     elif judge_mode == 'batch':
         prompt += f"""
-[The Start of User Instruction]
-{instruction}
-[The End of User Instruction]"""
+            [The Start of User Instruction]
+            {instruction}
+            [The End of User Instruction]"""
         assistant_name = "A"
         num_assistant = 0
         for i in range(len(responses)):
@@ -80,9 +80,9 @@ def construct_input(prompt_dict, judge_mode, setting, instruction, responses):
     
 def benchmark(model, judge_mode, setting, api, image_root, temperature, top_p):
     items = []
-    with open(f"../Dataset/Benchmark/{judge_mode}.jsonl", "r") as json_file:
+    with open(f"/home/zq/llm-as-judge/MLLM-Judge/Dataset/Benchmark/{judge_mode}.jsonl", "r") as json_file:
         for line in json_file:
-                items.append(json.loads(line))
+            items.append(json.loads(line))
     output_path = f"./benchmark_result/{judge_mode}_{model}.jsonl"
     prompt_dict = get_prompt()
     for item in tqdm(items[:], desc="Processing items"):
@@ -93,7 +93,6 @@ def benchmark(model, judge_mode, setting, api, image_root, temperature, top_p):
         item['mllm_judge'] = response
         with open(output_path, "a") as jsonl_file:
             jsonl_file.write(json.dumps(item) + "\n")
-        
 
 def main():
     parser = ArgumentParser()
@@ -105,11 +104,12 @@ def main():
     parser.add_argument("--setting", type=str, default="No COT", help="The setting of the evaluation")
     parser.add_argument("--api", type=str, default=None, help="API for inference.")
     args = parser.parse_args()
-    assert args.judge_mode not in ['score', 'batch', 'pair'], "Invalid judge mode"
-    assert args.model not in ['gemini', 'gpt-4v', 'gpt-4o', 'llava-1.6-34b', 'llava-1.6-13b', 'llava-1.6-7b', 'qwen-vl-plus', 'qwen-vl-max', 'qwen-vl-chat']
-    
-    benchmark = benchmark(args.model, args.judge_mode, args.setting, args.api, args.model_ckpt, args.image_root, args.temperature, args.top_p)
-    
+    # assert args.judge_mode not in ['score', 'batch', 'pair'], "Invalid judge mode"
+    # assert args.model not in ['gemini', 'gpt-4v', 'gpt-4o', 'llava-1.6-34b', 'llava-1.6-13b', 'llava-1.6-7b', 'qwen-vl-plus', 'qwen-vl-max', 'qwen-vl-chat']
+
+    # benchmark = benchmark(args.model, args.judge_mode, args.setting, args.api, args.model_ckpt, args.image_root, args.temperature, args.top_p)
+    benchmark(args.model, args.judge_mode, args.setting, args.api, args.image_root, args.temperature, args.top_p)
+
 
 if __name__ == '__main__':
     main()
